@@ -1,0 +1,12 @@
+.env
+
+# Bytecode
+__pycache__/
+*.pyc
+
+
+# Virtual environment
+venv/
+
+# VS Code settings (optional)
+.vscode/

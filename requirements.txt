@@ -1,0 +1,9 @@
+openai
+pdfplumber
+python-dotenv
+pandas
+requests
+fpdf
+pytesseract
+pdf2image
+PyPDF2 

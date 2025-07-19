@@ -1,3 +1,4 @@
+streamlit
 openai
 pdfplumber
 python-dotenv
@@ -6,6 +7,7 @@ requests
 fpdf
 pytesseract
 pdf2image
-PyPDF2 
-streamlit
+PyPDF2
 pymongo
+email-validator
+flask 

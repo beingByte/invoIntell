@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 import pandas as pd
 import requests
 from fpdf import FPDF
-import pytesseract
-from pdf2image import convert_from_path
 from PyPDF2 import PdfReader
 import tempfile
 import json
@@ -21,25 +19,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Remove detect_invoice_type and use a single prompt for all invoices
 
 def extract_text_from_pdf(file):
-    # Try extracting text normally
+    # Only extract text using PyPDF2
     reader = PdfReader(file)
     text = ""
     for page in reader.pages:
         text += page.extract_text() or ""
-    if text.strip():
-        return text
-
-    # If no text found, use OCR
-    file.seek(0)
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-        tmp_file.write(file.read())
-        tmp_file_path = tmp_file.name
-
-    images = convert_from_path(tmp_file_path)
-    ocr_text = ""
-    for img in images:
-        ocr_text += pytesseract.image_to_string(img)
-    return ocr_text
+    return text
 
 def get_invoice_feedback(invoice_text, use_mock=False):
     if use_mock:

@@ -5,6 +5,7 @@ python-dotenv
 pandas
 requests
 fpdf
+pdf2image
 PyPDF2
 pymongo
 email-validator

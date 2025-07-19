@@ -253,7 +253,7 @@ if 'show_pricing' not in st.session_state:
 
 user_email = st.session_state.get('user')
 user_name = None
-if user_email and users_col:
+if user_email and users_col is not None:
     try:
         user = users_col.find_one({'email': user_email})
         user_name = user.get('name', user_email.split('@')[0]) if user else user_email.split('@')[0]
@@ -397,7 +397,7 @@ if not st.session_state.get('user'):
 
 # Main app logic gated by login
 user_email = st.session_state.get('user')
-if user_email and users_col:
+if user_email and users_col is not None:
     try:
         user = users_col.find_one({'email': user_email})
         plan = user.get('plan', 'Free') if user else 'Free'

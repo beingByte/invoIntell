@@ -55,7 +55,7 @@ Invoice content:
 {invoice_text}
 '''
 
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-4-1106-preview",
         messages=[
             { "role": "system", "content": "You are a GST invoice checker bot." },
@@ -64,8 +64,7 @@ Invoice content:
         temperature=0.2,
         max_tokens=800
     )
-
-    return response.choices[0].message['content']
+    return response.choices[0].message.content
 
 def extract_fields_3way(invoice_text, po_text, grn_text):
     """
@@ -109,7 +108,7 @@ PO Text:
 GRN Text:
 {grn_text}
 '''
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-4-1106-preview",
         messages=[
             { "role": "system", "content": "You are an expert document parser." },
@@ -119,7 +118,7 @@ GRN Text:
         max_tokens=1200
     )
     import json, ast, re
-    raw = response.choices[0].message['content']
+    raw = response.choices[0].message.content
     match = re.search(r'(\{[\s\S]*\})', raw)
     json_str = match.group(1) if match else raw
     try:

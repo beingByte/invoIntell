@@ -16,7 +16,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Set the tesseract executable path (update if your path is different)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Users\vimal\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
+# pytesseract.pytesseract.tesseract_cmd = r"C:\Users\vimal\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
 
 # Remove detect_invoice_type and use a single prompt for all invoices
 

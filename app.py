@@ -467,6 +467,11 @@ if user_email:
                             st.error("Unsupported file format for GRN.")
                             grn_text = ""
 
+                        # Debug: Print extracted text to logs
+                        print("INVOICE TEXT:", invoice_text)
+                        print("PO TEXT:", po_text)
+                        print("GRN TEXT:", grn_text)
+
                         # Validate all three
                         from gst_checker import validate_3way
                         result = validate_3way(invoice_text, po_text, grn_text)

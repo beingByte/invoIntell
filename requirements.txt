@@ -7,3 +7,4 @@ fpdf
 pytesseract
 pdf2image
 PyPDF2 
+streamlit

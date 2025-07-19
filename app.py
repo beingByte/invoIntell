@@ -71,10 +71,24 @@ if show_pricing or st.session_state.get('show_pricing', False):
         st.info("Contact us to upgrade your plan!")
 
 # MongoDB setup
-MONGO_URI = 'mongodb://localhost:27017/'
-client = pymongo.MongoClient(MONGO_URI)
-db = client['gst_invoice_checker']
-users_col = db['users']
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
+# Debug: Print the URI being used (remove this after fixing)
+print(f"Using MongoDB URI: {MONGO_URI}")
+
+try:
+    client = pymongo.MongoClient(MONGO_URI)
+    # Test the connection
+    client.admin.command('ping')
+    print("MongoDB connection successful!")
+    db = client['gst_invoice_checker']
+    users_col = db['users']
+except Exception as e:
+    print(f"MongoDB connection failed: {e}")
+    st.error(f"Database connection failed: {e}")
+    # Create a dummy client to prevent crashes
+    client = None
+    db = None
+    users_col = None
 
 # Email sender setup (configure for your SMTP server)
 SMTP_SERVER = 'smtp.gmail.com'
@@ -120,11 +134,16 @@ def can_upload(user, plan):
     return False
 
 def increment_usage(email):
-    today = date.today().isoformat()
-    user = users_col.find_one({'email': email})
-    usage = user.get('usage', {})
-    usage[today] = usage.get(today, 0) + 1
-    users_col.update_one({'email': email}, {'$set': {'usage': usage}})
+    if not users_col:
+        return
+    try:
+        today = date.today().isoformat()
+        user = users_col.find_one({'email': email})
+        usage = user.get('usage', {})
+        usage[today] = usage.get(today, 0) + 1
+        users_col.update_one({'email': email}, {'$set': {'usage': usage}})
+    except Exception as e:
+        print(f"Error incrementing usage: {e}")
 
 def can_download(user, plan):
     today = date.today().isoformat()
@@ -139,11 +158,16 @@ def can_download(user, plan):
     return False
 
 def increment_download(email):
-    today = date.today().isoformat()
-    user = users_col.find_one({'email': email})
-    downloads = user.get('downloads', {})
-    downloads[today] = downloads.get(today, 0) + 1
-    users_col.update_one({'email': email}, {'$set': {'downloads': downloads}})
+    if not users_col:
+        return
+    try:
+        today = date.today().isoformat()
+        user = users_col.find_one({'email': email})
+        downloads = user.get('downloads', {})
+        downloads[today] = downloads.get(today, 0) + 1
+        users_col.update_one({'email': email}, {'$set': {'downloads': downloads}})
+    except Exception as e:
+        print(f"Error incrementing download: {e}")
 
 # Helper function to send renewal email
 
@@ -229,9 +253,15 @@ if 'show_pricing' not in st.session_state:
 
 user_email = st.session_state.get('user')
 user_name = None
-if user_email:
-    user = users_col.find_one({'email': user_email})
-    user_name = user.get('name', user_email.split('@')[0])
+if user_email and users_col:
+    try:
+        user = users_col.find_one({'email': user_email})
+        user_name = user.get('name', user_email.split('@')[0]) if user else user_email.split('@')[0]
+    except Exception as e:
+        print(f"Error finding user: {e}")
+        user_name = user_email.split('@')[0]
+elif user_email:
+    user_name = user_email.split('@')[0]
 
 login_btn_css = """
 <style>
@@ -367,9 +397,19 @@ if not st.session_state.get('user'):
 
 # Main app logic gated by login
 user_email = st.session_state.get('user')
+if user_email and users_col:
+    try:
+        user = users_col.find_one({'email': user_email})
+        plan = user.get('plan', 'Free') if user else 'Free'
+    except Exception as e:
+        print(f"Error finding user for main app: {e}")
+        plan = 'Free'
+elif user_email:
+    plan = 'Free'
+else:
+    plan = 'Free'
+
 if user_email:
-    user = users_col.find_one({'email': user_email})
-    plan = user.get('plan', 'Free')
     st.sidebar.info(f'Plan: {plan}')
     st.sidebar.write('Upgrade your plan for more features!')
 
